@@ -289,7 +289,7 @@
         },
         "privateLinkServiceConnections": [
           {
-            "name": "MyStorageQueuePrivateLinkConnection",
+            "name": "MyStorageFilePrivateLinkConnection",
             "properties": {
               "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]",
               "groupIds": [
@@ -315,7 +315,7 @@
         },
         "privateLinkServiceConnections": [
           {
-            "name": "MyStorageQueuePrivateLinkConnection",
+            "name": "MyStorageBlobPrivateLinkConnection",
             "properties": {
               "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]",
               "groupIds": [
@@ -367,7 +367,7 @@
         },
         "privateLinkServiceConnections": [
           {
-            "name": "MyStorageQueuePrivateLinkConnection",
+            "name": "MyStorageTablePrivateLinkConnection",
             "properties": {
               "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('StorageAccountName'))]",
               "groupIds": [
@@ -526,7 +526,7 @@
             },
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "[parameters('packageValue')]"
+              "value": "1"
             },
             {
               "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
@@ -550,30 +550,33 @@
             }
           ]
         }
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites/networkConfig",
-      "apiVersion": "2020-09-01",
-      "name": "[concat(parameters('AppName'), '/virtualNetwork')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('AppName'))]"
-      ],
-      "properties": {
-        "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('functionsSubnetName'))]",
-        "isSwift": true
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites/config",
-      "apiVersion": "2020-09-01",
-      "name": "[concat(parameters('AppName'), '/web')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/networkConfig', parameters('AppName'), 'virtualNetwork')]"
-      ],
-      "properties": {
-        "functionsRuntimeScaleMonitoringEnabled": true
-      }
+      },
+      "resources":[
+        {
+          "type": "Microsoft.Web/sites/networkConfig",
+          "apiVersion": "2020-09-01",
+          "name": "[concat(parameters('AppName'), '/virtualNetwork')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('AppName'))]"
+          ],
+          "properties": {
+            "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('functionsSubnetName'))]",
+            "isSwift": true
+          }
+        },
+        {
+          "type": "Microsoft.Web/sites/config",
+          "apiVersion": "2020-09-01",
+          "name": "[concat(parameters('AppName'), '/web')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('AppName'))]",
+            "[resourceId('Microsoft.Web/sites/networkConfig', parameters('AppName'), 'virtualNetwork')]"
+          ],
+          "properties": {
+            "functionsRuntimeScaleMonitoringEnabled": true
+          }
+        }        
+      ]      
     }
   ]
 }
